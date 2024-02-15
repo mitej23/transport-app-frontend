@@ -7,7 +7,7 @@ const Sidebar = () => {
 
   return (
     <div className='fixed flex flex-col w-[250px] p-8 h-screen bg-[#ffebea]'>
-      <h1 className='w-max m-auto font-bold text-2xl'>Aryan's Shop</h1>
+      <h1 className='w-max m-auto font-bold text-2xl'>S.V.T Enterprise</h1>
       <div className='mt-14 flex flex-col flex-1'>
         <NavLink to={'/'} className={({ isActive }) => `flex items-center mb-2 ${isActive ? 'text-[#fe100e] bg-red-100' : 'text-[#00000099] hover:bg-red-100 hover:text-[#fe100e]'}  p-2 rounded-md`} >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5">

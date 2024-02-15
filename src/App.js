@@ -3,13 +3,15 @@ import './App.css';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Orders from './pages/Orders';
 import Users from './pages/Users';
+import Login from './pages/auth/Login';
+import Register from './pages/auth/Register';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path='/login' exact element={<p>login</p>} />
-        <Route path='/register' exact element={<p>register</p>} />
+        <Route path='/login' exact element={<Login />} />
+        <Route path='/register' exact element={<Register />} />
         <Route path='/users' exact element={<Users />} />
         <Route path='/' exact element={<Orders />} />
       </Routes>
