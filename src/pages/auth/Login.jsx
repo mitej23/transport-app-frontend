@@ -1,4 +1,6 @@
+import { jwtDecode } from 'jwt-decode';
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies;
@@ -13,7 +15,7 @@ const Login = () => {
     email: '',
     password: '',
   })
-
+  const navigate = useNavigate()
 
 
   const handleLogin = () => {
@@ -29,11 +31,19 @@ const Login = () => {
     fetch('http://localhost:8000/api/v1/users/login-user', options)
       .then(response => response.json())
       .then(data => {
-        console.log("access token below")
-        console.log(data.data.accessToken)
         cookies.set('_user_token', data.data.accessToken)
-        console.log(data)
         setLoading(false)
+
+        // check userType from token
+        const decoded = jwtDecode(data?.data?.accessToken) || '';
+
+        if (decoded.userType === 'ADMIN') {
+          navigate('/admin')
+        } else {
+          navigate('/orders')
+        }
+
+
       })
       .catch(error => {
         alert("There was some error will adding data")
@@ -44,8 +54,6 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-
-    console.log(form.email, form.password)
 
     let errObj = {
       password: '',
@@ -96,7 +104,7 @@ const Login = () => {
     <form onSubmit={handleSubmit} className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] border p-10 rounded-lg shadow-lg min-w-[25rem] '>
       <h1 className='text-2xl font-bold mb-7'>Login</h1>
       <div className='flex flex-col mt-4'>
-        <label className='text-sm font-500'>Email</label>
+        <label className='text-sm font-semibold '>Email</label>
         <input
           type='text'
           name='email'
@@ -107,7 +115,7 @@ const Login = () => {
       </div>
       {formErrors['email'] && <p className='text-xs text-red-600 mt-2'>* email should be in correct format</p>}
       <div className='flex flex-col mt-4'>
-        <label className='text-sm font-500'>Password</label>
+        <label className='text-sm font-semibold '>Password</label>
         <input
           type='password'
           name='password'
@@ -118,12 +126,12 @@ const Login = () => {
       </div>
       {formErrors['password'] && <p className='text-xs text-red-600 mt-2'>* password cannot be empty</p>}
       <button
-        className='w-full border mt-8 py-3 font-semibold text-sm text-white bg-black rounded-md'
+        className='w-full border mt-8 py-3 font-semibold text-sm text-white bg-[#fe100e] rounded-md'
         type='submit'
         disabled={loading}
       >
         {
-          loading ? "Logging In..." : "Login In"
+          loading ? "Logging In..." : "Login"
         }
       </button>
     </form>

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import Layout from '../components/Layout'
+import Layout from '../../components/Layout'
 import Cookies from 'universal-cookie'
 import { jwtDecode } from "jwt-decode";
 
@@ -7,7 +7,7 @@ const cookies = new Cookies
 const Orders = () => {
 
   const fetchData = async () => {
-    let TOKEN = cookies.get("_user_token");
+    let TOKEN = cookies.get("_user_token") || "";
     const options = {
       method: 'GET',
       headers: {
@@ -24,10 +24,6 @@ const Orders = () => {
   }
 
   useEffect(() => {
-
-    let data = cookies.get('_user_token')
-    const decoded = jwtDecode(data);
-    console.log(decoded)
     fetchData()
   }, [])
 
