@@ -3,83 +3,8 @@ import Layout from '../../components/Layout'
 import Cookies from 'universal-cookie'
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
+import OrderStatusButton from '../../components/StatusButton/StatusButton';
 
-const statusArray = ["SHIPPED", "DELIVERED", "PENDING"]
-const statusColor = { "SHIPPED": 'red', 'DELIVERED': 'green', 'PENDING': 'yellow' }
-
-const getStatus = (status) => {
-  if (status === statusArray[0]) {
-    return "bg-red-100 text-red-500 border border-red-500 shadow"
-  } else if (status === statusArray[1]) {
-    return "bg-green-100 text-green-500 border border-green-500 shadow"
-  } else if (status === statusArray[2]) {
-    return "bg-yellow-100 text-yellow-500 border border-yellow-500 shadow"
-  }
-}
-
-const OrderStatusButton = ({ orderStatus }) => {
-  const [isDropDownOpen, setIsDropDownOpen] = useState(false)
-
-  const handleStatusClick = (e) => {
-    e.stopPropagation()
-    setIsDropDownOpen(!isDropDownOpen)
-  }
-
-  const handleUpdateStatus = (e, st) => {
-    e.stopPropagation()
-
-  }
-
-  return (
-    <div onClick={handleStatusClick} className='relative'>
-      <p className={`flex px-2 py-1 text-xs ${getStatus(orderStatus)} ml-0 rounded-md w-max m-auto`}>
-        {orderStatus}
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 ml-1"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-            clip-rule="evenodd"
-          />
-        </svg>
-      </p>
-      {
-        isDropDownOpen && (
-          <div
-            class="absolute z-10 mt-2 rounded-lg border border-gray-200 bg-white shadow-xl"
-            role="menu"
-          >
-            <div class="p-2">
-              {
-                statusArray.filter(status => status !== orderStatus).map((status, idx) => {
-                  return (
-                    <p
-                      onClick={(e) => handleUpdateStatus(e, status)}
-                      class={`flex w-max items-center group rounded-lg px-2 py-1 text-xs text-center ${getStatus(status)} ${idx === 0 ? 'mb-2' : ''}`}
-                    >
-                      {status}
-                      <span className='hidden group-hover:block ml-1'>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                        </svg>
-                      </span>
-                    </p>
-
-                  )
-                })
-              }
-            </div>
-          </div>
-        )
-      }
-
-    </div>
-  )
-}
 
 // update order status - write api for individually updating order status using order ui -> pop up on success
 
@@ -185,7 +110,27 @@ const Orders = () => {
       <div>
         <h1 className='font-bold text-2xl mb-6'>All Orders</h1>
       </div>
+      <div class="mb-6">
+        <dl class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div class="flex flex-col rounded-lg border border-gray-100 shadow px-4 py-8 text-center">
+            <dt class="order-last text-lg font-medium text-gray-500">Total Sales</dt>
 
+            <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">₹4.8m</dd>
+          </div>
+
+          <div class="flex flex-col rounded-lg border border-gray-100 shadow px-4 py-8 text-center">
+            <dt class="order-last text-lg font-medium text-gray-500">Total Orders</dt>
+
+            <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">24</dd>
+          </div>
+
+          <div class="flex flex-col rounded-lg border border-gray-100 shadow px-4 py-8 text-center">
+            <dt class="order-last text-lg font-medium text-gray-500">Total Customers</dt>
+
+            <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">12</dd>
+          </div>
+        </dl>
+      </div>
       <table className="border drop-shadow-md rounded-lg shadow-sm sm:rounded-lg mb-4 w-full text-sm text-left">
         <thead className="text-xs uppercase bg-gray-50">
           <tr>
@@ -232,7 +177,7 @@ const Orders = () => {
                       <td className="py-3 px-4 text-center relative">
                         {productType}
                       </td>
-                      <td className="py-2 px-4 text-left">
+                      <td className="py-2 px-4 text-left" onClick={(e) => e.stopPropagation()}>
                         <OrderStatusButton orderStatus={orderStatus} />
                       </td>
                     </tr>

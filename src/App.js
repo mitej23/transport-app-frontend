@@ -8,6 +8,8 @@ import Users from './pages/admin/Users';
 import Orders from './pages/admin/Orders';
 import ProtectedRoutes from './components/Layout/ProtectedRoutes';
 import UserOrders from './pages/user/UserOrders';
+import CreateOrder from './pages/admin/CreateOrder';
+import NotFound from './pages/extra/NotFound';
 
 function App() {
   return (
@@ -18,6 +20,9 @@ function App() {
         <Route path='/admin' exact element={<ProtectedRoutes><Orders /></ProtectedRoutes>} />
         <Route path='/admin/users' exact element={<ProtectedRoutes><Users /></ProtectedRoutes>} />
         <Route path='/orders' exact element={<UserOrders />} />
+        <Route path='/create-order' exact element={<CreateOrder />} />
+        <Route path='/' exact element={<h1>Home Page</h1>} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
     </Router>
   );
