@@ -2,6 +2,8 @@ import React, { useState } from 'react'
 import Layout from '../../components/Layout'
 import { useNavigate } from 'react-router-dom'
 import UserLayout from '../../components/Layout/UserLayout'
+import Cookies from 'universal-cookie';
+const cookies = new Cookies;
 
 const LocationIcon = () => {
   return (
@@ -16,7 +18,7 @@ const LocationIcon = () => {
 
 const CreateOrder = () => {
   const navigate = useNavigate()
-
+  const [loading, setLoading] = useState(false)
   const [productData, setProductData] = useState({
     productName: 'Cylinders',
     productQuantity: '6',
@@ -25,8 +27,6 @@ const CreateOrder = () => {
     dropLocation: '',
     dropAddress: '',
     productType: 'Large',
-    // orderStatus: "PENDING",
-    // owner: "Mitej Madan"
   })
 
   const handleSetFormData = (e) => {
@@ -41,6 +41,35 @@ const CreateOrder = () => {
 
   }
 
+  const handleOrderSubmit = (e) => {
+    e.preventDefault()
+
+    setLoading(true)
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'include',
+        'Authorization': cookies.get('_user_token')
+      },
+      body: JSON.stringify(productData)
+    };
+
+    // /api/v1/orders
+    fetch('http://localhost:8000/api/v1/orders/place-order', options)
+      .then(response => response.json())
+      .then(data => {
+        navigate('/orders')
+      })
+      .catch(err => {
+        console.log(err)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }
+
 
   return (
     <UserLayout>
@@ -51,7 +80,7 @@ const CreateOrder = () => {
         <p className='ml-1'>Orders</p>
       </div>
       <h1 className='text-xl font-bold'>Create Order</h1>
-      <div className='grid grid-cols-2 gap-4 mt-4'>
+      <form onSubmit={handleOrderSubmit} className='grid grid-cols-2 gap-4 mt-4'>
         <div className='flex flex-col'>
           <label className='text-sm font-semibold text-gray-500'>Product Name</label>
           <input
@@ -117,7 +146,15 @@ const CreateOrder = () => {
             <LocationIcon />
           </div>
         </div>
-      </div>
+        <button
+          type='submit'
+          class="w-max mt-6 flex flex-end bg-[#fe100e] text-white shadow-sm rounded-md border px-4 py-2 text-sm font-medium focus:relative"
+        >
+          {
+            loading ? 'Placing' : "Place Order"
+          }
+        </button>
+      </form>
     </UserLayout>
   )
 }

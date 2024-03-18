@@ -18,72 +18,7 @@ const cookies = new Cookies
 const UserOrders = () => {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState([{
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  }])
+  const [data, setData] = useState([])
 
   const fetchData = async () => {
     let TOKEN = cookies.get("_user_token") || "";
@@ -97,7 +32,7 @@ const UserOrders = () => {
 
     fetch('http://localhost:8000/api/v1/orders/get-my-orders', options)
       .then(response => response.json())
-      // .then(data => setItems(data))
+      .then(data => setData(data.data.orders))
       .catch(error => console.error(error));
 
   }
@@ -128,13 +63,16 @@ const UserOrders = () => {
               Product Name
             </th>
             <th scope="col" className="py-3 px-4 text-center">
-              Owner
-            </th>
-            <th scope="col" className="py-3 px-4 text-center">
               Qty.
             </th>
             <th scope="col" className="py-3 px-4 text-center">
               Type
+            </th>
+            <th scope="col" className="py-3 px-4 text-center">
+              Pickup Address
+            </th>
+            <th scope="col" className="py-3 px-4 text-center">
+              Drop Address
             </th>
             <th scope="col" className="py-3 px-4 text-left">
               Status
@@ -159,13 +97,16 @@ const UserOrders = () => {
                         {productName}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {owner}
-                      </td>
-                      <td className="py-3 px-4 text-center">
                         {productQuantity}
                       </td>
                       <td className="py-3 px-4 text-center relative">
                         {productType}
+                      </td>
+                      <td className="py-3 px-4 text-center relative">
+                        {pickUpAddress}
+                      </td>
+                      <td className="py-3 px-4 text-center relative">
+                        {dropAddress}
                       </td>
                       <td className="py-2 px-4 text-left" onClick={(e) => e.stopPropagation()}>
                         {/* <OrderStatusButton orderStatus={orderStatus} /> */}

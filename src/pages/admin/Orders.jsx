@@ -12,88 +12,35 @@ const cookies = new Cookies
 const Orders = () => {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
-  const [data, setData] = useState([{
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  },
-  {
-    productName: 'Cylinders',
-    productQuantity: '6',
-    pickupLocation: '',
-    pickUpAddress: '',
-    dropLocation: '',
-    dropAddress: '',
-    productType: 'Large',
-    orderStatus: "PENDING",
-    owner: "Mitej Madan"
-  }])
+  const [data, setData] = useState([])
+  const [dashboardData, setDashboardData] = useState({
+    totalOrders: '',
+    totalUsers: ''
+  })
+  let TOKEN = cookies.get("_user_token") || "";
+  const options = {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${TOKEN}`
+    },
+  };
 
   const fetchData = async () => {
-    let TOKEN = cookies.get("_user_token") || "";
-    const options = {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${TOKEN}`
-      },
-    };
 
     fetch('http://localhost:8000/api/v1/orders/get-all-orders', options)
       .then(response => response.json())
-      // .then(data => setItems(data))
+      .then(data => setData(data.data.orders))
       .catch(error => console.error(error));
 
+  }
+
+  const fetchDashboardData = async () => {
+    // get-dashboard-data
+    fetch('http://localhost:8000/api/v1/orders/get-dashboard-data', options)
+      .then(response => response.json())
+      .then(data => setDashboardData(data.data))
+      .catch(error => console.error(error));
   }
 
   const handleOrderClick = () => {
@@ -102,6 +49,7 @@ const Orders = () => {
 
   useEffect(() => {
     fetchData()
+    fetchDashboardData()
   }, [])
 
 
@@ -112,22 +60,22 @@ const Orders = () => {
       </div>
       <div class="mb-6">
         <dl class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div class="flex flex-col rounded-lg border border-gray-100 shadow px-4 py-8 text-center">
+          {/* <div class="flex flex-col rounded-lg border border-gray-100 shadow px-4 py-8 text-center">
             <dt class="order-last text-lg font-medium text-gray-500">Total Sales</dt>
 
             <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">₹4.8m</dd>
-          </div>
+          </div> */}
 
           <div class="flex flex-col rounded-lg border border-gray-100 shadow px-4 py-8 text-center">
             <dt class="order-last text-lg font-medium text-gray-500">Total Orders</dt>
 
-            <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">24</dd>
+            <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">{dashboardData.totalOrders}</dd>
           </div>
 
           <div class="flex flex-col rounded-lg border border-gray-100 shadow px-4 py-8 text-center">
             <dt class="order-last text-lg font-medium text-gray-500">Total Customers</dt>
 
-            <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">12</dd>
+            <dd class="text-4xl font-extrabold text-blue-600 md:text-3xl">{dashboardData.totalUsers}</dd>
           </div>
         </dl>
       </div>
@@ -146,6 +94,12 @@ const Orders = () => {
             <th scope="col" className="py-3 px-4 text-center">
               Type
             </th>
+            <th scope="col" className="py-3 px-4 text-center">
+              Pickup Address
+            </th>
+            <th scope="col" className="py-3 px-4 text-center">
+              Drop Address
+            </th>
             <th scope="col" className="py-3 px-4 text-left">
               Status
             </th>
@@ -160,16 +114,17 @@ const Orders = () => {
                 </td>
               </tr>
             ) : (
-              data.length !== 0 ? (
+              data?.length !== 0 ? (
                 data.map((order) => {
-                  const { productName, productQuantity, pickupLocation, pickUpAddress, dropLocation, dropAddress, productType, orderStatus, owner } = order
+                  console.log(order)
+                  const { productName, productQuantity, pickupLocation, pickUpAddress, dropLocation, dropAddress, productType, orderStatus, owner, _id } = order
                   return (
                     <tr className="bg-white border-b hover:cursor-pointer hover:bg-gray-50" onClick={handleOrderClick}>
                       <td className="py-3 px-4 text-left">
                         {productName}
                       </td>
                       <td className="py-3 px-4 text-center">
-                        {owner}
+                        {owner?.fullName}
                       </td>
                       <td className="py-3 px-4 text-center">
                         {productQuantity}
@@ -177,8 +132,14 @@ const Orders = () => {
                       <td className="py-3 px-4 text-center relative">
                         {productType}
                       </td>
+                      <td className="py-3 px-4 text-center relative">
+                        {pickUpAddress}
+                      </td>
+                      <td className="py-3 px-4 text-center relative">
+                        {dropAddress}
+                      </td>
                       <td className="py-2 px-4 text-left" onClick={(e) => e.stopPropagation()}>
-                        <OrderStatusButton orderStatus={orderStatus} />
+                        <OrderStatusButton orderStatus={orderStatus} _id={_id} fetchData={fetchData} />
                       </td>
                     </tr>
                   )

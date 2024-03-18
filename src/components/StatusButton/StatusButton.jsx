@@ -1,5 +1,9 @@
 import { useState } from "react"
 import useOutsideClick from "../../hooks/useOutsideClick"
+import Cookies from "universal-cookie"
+import toast from "react-hot-toast"
+
+const cookies = new Cookies
 
 const statusArray = ["SHIPPED", "DELIVERED", "PENDING"]
 const statusColor = { "SHIPPED": 'red', 'DELIVERED': 'green', 'PENDING': 'yellow' }
@@ -14,7 +18,7 @@ const getStatus = (status) => {
   }
 }
 
-const OrderStatusButton = ({ orderStatus }) => {
+const OrderStatusButton = ({ orderStatus, fetchData, _id }) => {
   const [isDropDownOpen, setIsDropDownOpen] = useState(false)
   const handleStatusClick = (e) => {
     e.stopPropagation()
@@ -23,6 +27,31 @@ const OrderStatusButton = ({ orderStatus }) => {
 
   const handleUpdateStatus = (e, st) => {
     e.stopPropagation()
+
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        credentials: 'include',
+        'Authorization': cookies.get('_user_token')
+      },
+      body: JSON.stringify({
+        orderId: _id,
+        newStatus: st
+      })
+    };
+
+    // /api/v1/orders
+    fetch('http://localhost:8000/api/v1/orders/update-order', options)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data)
+        fetchData()
+        toast.success('Successfully updated Order Status!')
+      })
+      .catch(err => {
+        console.log(err)
+      })
 
   }
 

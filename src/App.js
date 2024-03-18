@@ -8,12 +8,17 @@ import Users from './pages/admin/Users';
 import Orders from './pages/admin/Orders';
 import ProtectedRoutes from './components/Layout/ProtectedRoutes';
 import UserOrders from './pages/user/UserOrders';
-import CreateOrder from './pages/admin/CreateOrder';
+import CreateOrder from './pages/user/CreateOrder';
 import NotFound from './pages/extra/NotFound';
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
     <Router>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+      />
       <Routes>
         <Route path='/login' exact element={<Login />} />
         <Route path='/register' exact element={<Register />} />
