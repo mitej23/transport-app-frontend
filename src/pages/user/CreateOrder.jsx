@@ -1,13 +1,56 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import Layout from '../../components/Layout'
+import Map from '../../components/Map/Map'
 import { useNavigate } from 'react-router-dom'
 import UserLayout from '../../components/Layout/UserLayout'
 import Cookies from 'universal-cookie';
 const cookies = new Cookies;
 
-const LocationIcon = () => {
+
+const MapContainer = ({ setIsMapVisible, mapSelectedFor, productData, setProductData }) => {
+
+  const [viewport, setViewport] = useState({
+    latitude: 19.236988,
+    longitude: 72.846595,
+    width: "100%",
+    height: "100%",
+    zoom: 14,
+  });
+
+  const handleMapClicked = (e) => {
+    e.stopPropagation()
+  }
+
+  const handleSelectLocation = () => {
+
+    let data = {
+      ...productData,
+      [mapSelectedFor]: {
+        latitude: viewport.latitude,
+        longitude: viewport.longitude
+      }
+    }
+
+    setProductData(data)
+    setIsMapVisible(false)
+  }
+
   return (
-    <div className='ml-4 border shadow-sm p-2 h-max w-max rounded-md'>
+    <div className='h-full w-full bg-black/75 z-10 absolute top-0 left-0' onClick={() => setIsMapVisible(false)}>
+      <div className='fixed top-[10%] left-[10%] w-[80%] h-[80%] bg-blue-300 rounded-md shadow-2xl' onClick={(e) => handleMapClicked(e)}>
+        <Map viewport={viewport} setViewport={setViewport} />
+        <button
+          onClick={handleSelectLocation}
+          className='class="w-max mt-4 ml-auto flex flex-end bg-[#fe100e] border-none text-white shadow-sm rounded-md border px-4 py-2 text-sm font-medium focus:relative"'
+        >Select Location</button>
+      </div>
+    </div>
+  )
+}
+
+const LocationIcon = ({ handleClick }) => {
+  return (
+    <div className='ml-4 border shadow-sm p-2 h-max w-max rounded-md hover:cursor-pointer' onClick={() => handleClick()}>
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
@@ -18,13 +61,21 @@ const LocationIcon = () => {
 
 const CreateOrder = () => {
   const navigate = useNavigate()
+  const [isMapVisible, setIsMapVisible] = useState(false)
+  const [mapSelectedFor, setMapSelectedFor] = useState('')
   const [loading, setLoading] = useState(false)
   const [productData, setProductData] = useState({
     productName: 'Cylinders',
     productQuantity: '6',
-    pickupLocation: '',
+    pickupLocation: {
+      latitude: '',
+      longitude: ''
+    },
     pickUpAddress: '',
-    dropLocation: '',
+    dropLocation: {
+      latitude: '',
+      longitude: ''
+    },
     dropAddress: '',
     productType: 'Large',
   })
@@ -68,6 +119,11 @@ const CreateOrder = () => {
       .finally(() => {
         setLoading(false)
       })
+  }
+
+  const handleLocationClick = (mapFor) => {
+    setIsMapVisible(true)
+    setMapSelectedFor(mapFor)
   }
 
 
@@ -119,31 +175,41 @@ const CreateOrder = () => {
         <div>
           <label className='text-sm font-semibold text-gray-500'>Pickup Location</label>
           <div className='flex flex-row mt-2'>
-            <textarea
-              type='text'
-              value={productData['pickUpAddress']}
-              name='pickUpAddress'
-              onChange={handleSetFormData}
-              placeholder='Enter pickup Address...'
-              rows="4"
-              className='flex-1 border px-3 py-3 rounded-md text-sm shadow'
-            />
-            <LocationIcon />
+            <div className='w-[100%]'>
+              <textarea
+                type='text'
+                value={productData['pickUpAddress']}
+                name='pickUpAddress'
+                onChange={handleSetFormData}
+                placeholder='Enter pickup Address...'
+                rows="4"
+                className='flex-1 border px-3 py-3 rounded-md text-sm shadow w-[100%]'
+              />
+              <p className='text-xs text-gray-400'>
+                Pickup location: {productData?.pickupLocation?.latitude},{productData?.pickupLocation?.longitude}
+              </p>
+            </div>
+            <LocationIcon handleClick={() => handleLocationClick('pickupLocation')} />
           </div>
         </div>
         <div>
           <label className='text-sm font-semibold text-gray-500'>Drop Location</label>
           <div className='flex flex-row mt-2'>
-            <textarea
-              type='text'
-              value={productData['dropAddress']}
-              name='dropAddress'
-              onChange={handleSetFormData}
-              placeholder='Enter Drop Address...'
-              rows="4"
-              className='flex-1 border px-3 py-3 rounded-md text-sm shadow'
-            />
-            <LocationIcon />
+            <div className='w-[100%]'>
+              <textarea
+                type='text'
+                value={productData['dropAddress']}
+                name='dropAddress'
+                onChange={handleSetFormData}
+                placeholder='Enter Drop Address...'
+                rows="4"
+                className='flex-1 border px-3 py-3 rounded-md text-sm shadow w-[100%] '
+              />
+              <p className='text-xs text-gray-400'>
+                Drop location: {productData?.dropLocation?.latitude},{productData?.dropLocation?.longitude}
+              </p>
+            </div>
+            <LocationIcon handleClick={() => handleLocationClick('dropLocation')} />
           </div>
         </div>
         <button
@@ -155,6 +221,14 @@ const CreateOrder = () => {
           }
         </button>
       </form>
+      {isMapVisible && <MapContainer
+        setProductData={setProductData}
+        productData={productData}
+        mapSelectedFor={mapSelectedFor}
+        isMapVisible={isMapVisible}
+        setIsMapVisible={setIsMapVisible}
+      />}
+
     </UserLayout>
   )
 }
