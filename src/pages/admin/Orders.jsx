@@ -4,6 +4,7 @@ import Cookies from 'universal-cookie'
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import OrderStatusButton from '../../components/StatusButton/StatusButton';
+import MapContainer from '../../components/Map/Map';
 
 
 // update order status - write api for individually updating order status using order ui -> pop up on success
@@ -11,6 +12,8 @@ import OrderStatusButton from '../../components/StatusButton/StatusButton';
 const cookies = new Cookies
 const Orders = () => {
   const navigate = useNavigate()
+  const [isMapVisible, setIsMapVisible] = useState(false)
+  const [selectedMapOrder, setSelectedMapOrder] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [data, setData] = useState([])
   const [dashboardData, setDashboardData] = useState({
@@ -27,12 +30,10 @@ const Orders = () => {
   };
 
   const fetchData = async () => {
-
     fetch('http://localhost:8000/api/v1/orders/get-all-orders', options)
       .then(response => response.json())
       .then(data => setData(data.data.orders))
       .catch(error => console.error(error));
-
   }
 
   const fetchDashboardData = async () => {
@@ -52,6 +53,10 @@ const Orders = () => {
     fetchDashboardData()
   }, [])
 
+  const handleShowMap = (order) => {
+    setIsMapVisible(true)
+    setSelectedMapOrder(order)
+  }
 
   return (
     <Layout>
@@ -100,6 +105,9 @@ const Orders = () => {
             <th scope="col" className="py-3 px-4 text-center">
               Drop Address
             </th>
+            <th scope="col" className="py-3 px-4 text-center">
+              Location
+            </th>
             <th scope="col" className="py-3 px-4 text-left">
               Status
             </th>
@@ -116,7 +124,6 @@ const Orders = () => {
             ) : (
               data?.length !== 0 ? (
                 data.map((order) => {
-                  console.log(order)
                   const { productName, productQuantity, pickupLocation, pickUpAddress, dropLocation, dropAddress, productType, orderStatus, owner, _id } = order
                   return (
                     <tr className="bg-white border-b hover:cursor-pointer hover:bg-gray-50" onClick={handleOrderClick}>
@@ -138,6 +145,16 @@ const Orders = () => {
                       <td className="py-3 px-4 text-center relative">
                         {dropAddress}
                       </td>
+                      <td className='py-3 px-4 text-center relative'>
+                        {
+                          pickupLocation?.coordinates && (
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} onClick={() => handleShowMap(order)} className={`w-5 h-5 mx-auto stroke-gray-400 hover:stroke-black hover:w-6 hover:h-6`}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                            </svg>
+                          )
+                        }
+                      </td>
                       <td className="py-2 px-4 text-left" onClick={(e) => e.stopPropagation()}>
                         <OrderStatusButton orderStatus={orderStatus} _id={_id} fetchData={fetchData} />
                       </td>
@@ -155,6 +172,24 @@ const Orders = () => {
           }
         </tbody>
       </table>
+      {
+        isMapVisible && (
+          <MapContainer
+            setIsMapVisible={setIsMapVisible}
+            markers={[
+              {
+                latitude: selectedMapOrder?.pickupLocation?.coordinates[1],
+                longitude: selectedMapOrder?.pickupLocation?.coordinates[0]
+              },
+              {
+                latitude: selectedMapOrder?.dropLocation?.coordinates[1],
+                longitude: selectedMapOrder?.dropLocation?.coordinates[0]
+              },
+            ]}
+
+          />
+        )
+      }
     </Layout>
   )
 }
