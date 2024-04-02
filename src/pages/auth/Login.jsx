@@ -1,6 +1,6 @@
 import { jwtDecode } from 'jwt-decode';
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Cookies from 'universal-cookie';
 
 const cookies = new Cookies;
@@ -134,6 +134,7 @@ const Login = () => {
           loading ? "Logging In..." : "Login"
         }
       </button>
+      <p className='text-sm mt-3'>Not an user ? <Link to={'/register'} className='underline text-[#fe100e]'>Register</Link></p>
     </form>
   )
 }
